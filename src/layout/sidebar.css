@@ -1,0 +1,97 @@
+.sidebar {
+    height: 100vh;
+    background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+    color: #e2e8f0;
+    transition: width 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Width states */
+.sidebar--open {
+    width: 260px;
+}
+
+.sidebar--closed {
+    width: 80px;
+}
+
+/* Logo */
+.sidebar__logo {
+    font-size: 20px;
+    font-weight: 600;
+    padding: 24px 20px;
+    text-align: left;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+}
+
+/* Nav */
+.sidebar__nav {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 8px;
+}
+
+/* Nav Items */
+.sidebar__item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 14px;
+    text-decoration: none;
+    color: #94a3b8;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.25s ease;
+    position: relative;
+}
+
+/* Hover */
+.sidebar__item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    transform: translateX(4px);
+}
+
+/* Active */
+.sidebar__item--active {
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Active indicator bar */
+.sidebar__item--active::before {
+    content: "";
+    position: absolute;
+    left: -10px;
+    height: 60%;
+    width: 4px;
+    background: #3b82f6;
+    border-radius: 10px;
+}
+
+/* Icon */
+.sidebar__icon {
+    font-size: 18px;
+    min-width: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Label */
+.sidebar__label {
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+}
+
+/* Collapse behavior */
+.sidebar--closed .sidebar__label {
+    opacity: 0;
+    pointer-events: none;
+}
