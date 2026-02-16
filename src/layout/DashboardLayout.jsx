@@ -1,23 +1,22 @@
-import { useState } from "react";
-import Sidebar from "./Sidebar";
-import Footer from "./Footer";
+import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import Sidebar from './Sidebar';
+import Navbar from './Navbar';
+import Footer from './Footer';
 
-export default function Dashboard(){
-    const [isOpen, setIsOpen] = useState(true);
+export default function DashboardLayout() {
+  const [isOpen, setIsOpen] = useState(true);
 
-    return(
-        <div style = {{display: "flex"}}>
-
-            <Sidebar
-                isOpen={isOpen}
-            />
-
-            <div style={{flex: 1}}>
-                <button className="btn-toggle" onClick={()=>
-                    setIsOpen(!isOpen)
-                }>☰</button>
-            </div>
-        </div>
-    )
+  return (
+    <div className="layout">
+      <Sidebar isOpen={isOpen} />
+      <div className="layout__main">
+        <Navbar toggleSidebar={() => setIsOpen(!isOpen)} />
+        <main className="layout__content">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
+    </div>
+  );
 }
-
