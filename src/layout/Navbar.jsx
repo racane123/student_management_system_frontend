@@ -9,6 +9,7 @@ const routeTitles = {
   '/dashboard/students': 'Students',
   '/dashboard/teachers': 'Teachers',
   '/dashboard/classes': 'Classes',
+  '/dashboard/subjects': 'Subjects',
   '/dashboard/attendance': 'Attendance',
   '/dashboard/exams': 'Exams',
   '/dashboard/results': 'Results',
