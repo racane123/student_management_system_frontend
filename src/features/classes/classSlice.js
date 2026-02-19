@@ -199,4 +199,6 @@ export const {
   clearError,
 } = classesSlice.actions;
 
+export const selectAllClasses = (state) => state.classes.classList ?? [];
+
 export default classesSlice.reducer;

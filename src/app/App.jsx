@@ -16,6 +16,9 @@ import ClassFormPage from '../features/classes/pages/ClassFormPage';
 import SubjectList from '../features/subjects/pages/SubjectList';
 import SubjectDetails from '../features/subjects/pages/SubjectDetails';
 import SubjectFormPage from '../features/subjects/pages/SubjectFormPage';
+import AttendanceList from '../features/attendance/pages/AttendanceList';
+import MarkAttendance from '../features/attendance/pages/MarkAttendance';
+import AttendanceDetails from '../features/attendance/pages/AttendanceDetails';
 
 function App() {
   return (
@@ -46,6 +49,9 @@ function App() {
         <Route path="subjects/new" element={<SubjectFormPage />} />
         <Route path="subjects/:id" element={<SubjectDetails />} />
         <Route path="subjects/:id/edit" element={<SubjectFormPage />} />
+        <Route path="attendance" element={<AttendanceList />} />
+        <Route path="attendance/mark" element={<MarkAttendance />} />
+        <Route path="attendance/:id" element={<AttendanceDetails />} />
         <Route
           path="fees"
           element={

@@ -189,4 +189,6 @@ export const {
   clearError,
 } = studentsSlice.actions;
 
+export const selectAllStudents = (state) => state.students.studentList ?? [];
+
 export default studentsSlice.reducer;
