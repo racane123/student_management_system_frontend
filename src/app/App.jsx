@@ -19,6 +19,9 @@ import SubjectFormPage from '../features/subjects/pages/SubjectFormPage';
 import AttendanceList from '../features/attendance/pages/AttendanceList';
 import MarkAttendance from '../features/attendance/pages/MarkAttendance';
 import AttendanceDetails from '../features/attendance/pages/AttendanceDetails';
+import ExamList from '../features/exams/pages/ExamList';
+import ExamDetails from '../features/exams/pages/ExamDetails';
+import ExamFormPage from '../features/exams/pages/ExamFormPage';
 
 function App() {
   return (
@@ -52,6 +55,10 @@ function App() {
         <Route path="attendance" element={<AttendanceList />} />
         <Route path="attendance/mark" element={<MarkAttendance />} />
         <Route path="attendance/:id" element={<AttendanceDetails />} />
+        <Route path="exams" element={<ExamList />} />
+        <Route path="exams/new" element={<ExamFormPage />} />
+        <Route path="exams/:id" element={<ExamDetails />} />
+        <Route path="exams/:id/edit" element={<ExamFormPage />} />
         <Route
           path="fees"
           element={
