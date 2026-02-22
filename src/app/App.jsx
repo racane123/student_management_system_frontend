@@ -3,7 +3,10 @@ import ProtectedRoute from '../components/guards/ProtectedRoute';
 import DashboardLayout from '../layout/DashboardLayout';
 import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard';
-import Fees from '../pages/Fees';
+import FeesList from '../features/fees/pages/FeesList';
+import AssignFee from '../features/fees/pages/AssignFee';
+import RevenueSummary from '../features/fees/pages/RevenueSummary';
+import FeeDetails from '../features/fees/pages/FeeDetails';
 import StudentList from '../features/students/pages/StudentList';
 import StudentDetails from '../features/students/pages/StudentDetails';
 import StudentFormPage from '../features/students/pages/StudentFormPage';
@@ -22,6 +25,12 @@ import AttendanceDetails from '../features/attendance/pages/AttendanceDetails';
 import ExamList from '../features/exams/pages/ExamList';
 import ExamDetails from '../features/exams/pages/ExamDetails';
 import ExamFormPage from '../features/exams/pages/ExamFormPage';
+import ResultsList from '../features/results/pages/ResultsList';
+import EnterResults from '../features/results/pages/EnterResults';
+import ResultSummary from '../features/results/pages/ResultSummary';
+import ResultDetails from '../features/results/pages/ResultDetails';
+import ReportCenter from '../features/reports/pages/ReportCenter';
+import FinancialReport from '../features/reports/pages/FinancialReport';
 
 function App() {
   return (
@@ -59,14 +68,44 @@ function App() {
         <Route path="exams/new" element={<ExamFormPage />} />
         <Route path="exams/:id" element={<ExamDetails />} />
         <Route path="exams/:id/edit" element={<ExamFormPage />} />
+        <Route path="results" element={<ResultsList />} />
+        <Route path="results/enter" element={<EnterResults />} />
+        <Route path="results/summary" element={<ResultSummary />} />
+        <Route path="results/:id" element={<ResultDetails />} />
         <Route
           path="fees"
           element={
             <ProtectedRoute allowedRoles={['admin']}>
-              <Fees />
+              <FeesList />
             </ProtectedRoute>
           }
         />
+        <Route
+          path="fees/assign"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AssignFee />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="fees/summary"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <RevenueSummary />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="fees/:id"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <FeeDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="reports" element={<ReportCenter />} />
+        <Route path="reports/financial" element={<FinancialReport />} />
       </Route>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
