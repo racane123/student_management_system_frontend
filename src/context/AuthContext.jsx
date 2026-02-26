@@ -1,16 +1,19 @@
 /**
- * MILESTONE 2: The Auth & Role Guard (context)
- * Provides user, login, logout and wires 401 handler to logout.
- * Place in: src/context/AuthContext.jsx
+ * Auth & Role Guard (context)
+ * Provides user, login, logout and wires 401 handler.
+ * On logout, calls POST /auth/logout with refreshToken then clears storage and Redux.
  */
 
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { setUnauthorizedHandler } from '../services/api';
+import { api, setUnauthorizedHandler } from '../services/api';
+import { store } from '../store';
+import { clearAuth } from '../features/auth/authSlice';
 
 const AuthContext = createContext(null);
 
 const USER_STORAGE_KEY = 'user';
 const TOKEN_STORAGE_KEY = 'token';
+const REFRESH_TOKEN_STORAGE_KEY = 'refreshToken';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -22,16 +25,27 @@ export function AuthProvider({ children }) {
     }
   });
 
-  const login = useCallback((userData, token) => {
+  const login = useCallback((userData, token, refreshToken) => {
     localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    if (refreshToken) localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, refreshToken);
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
     setUser(userData);
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem(TOKEN_STORAGE_KEY);
-    localStorage.removeItem(USER_STORAGE_KEY);
-    setUser(null);
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_STORAGE_KEY);
+    const clearAll = () => {
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_STORAGE_KEY);
+      localStorage.removeItem(USER_STORAGE_KEY);
+      setUser(null);
+      store.dispatch(clearAuth());
+    };
+    if (refreshToken) {
+      api.post('/auth/logout', { refreshToken }).catch(() => {}).finally(clearAll);
+    } else {
+      clearAll();
+    }
   }, []);
 
   useEffect(() => {

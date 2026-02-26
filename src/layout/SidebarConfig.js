@@ -10,6 +10,7 @@ import {
   Wallet,
   FileText,
   UserCog,
+  ShieldCheck,
 } from 'lucide-react';
 
 export const sidebarItems = [
@@ -23,5 +24,6 @@ export const sidebarItems = [
   { label: 'Results', path: '/dashboard/results', icon: BarChart3 },
   { label: 'Fees', path: '/dashboard/fees', icon: Wallet },
   { label: 'Reports', path: '/dashboard/reports', icon: FileText },
+  { label: 'Role permissions', path: '/dashboard/role-permissions', icon: ShieldCheck },
   { label: 'Users', path: '/dashboard/users', icon: UserCog },
 ];

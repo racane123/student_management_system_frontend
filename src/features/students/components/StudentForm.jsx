@@ -12,6 +12,10 @@ import { User, Mail, Phone, MapPin, Users, Calendar } from 'lucide-react';
 const phoneRegex = /^(\+63|0)?[0-9]{10}$/;
 
 const schema = yup.object({
+  admissionNo: yup
+    .string()
+    .required('Admission number is required')
+    .matches(/^ST-\d{3}$/, 'Admission number must match pattern ST-000'),
   firstName: yup.string().required('First name is required').trim(),
   lastName: yup.string().required('Last name is required').trim(),
   gender: yup.string().required('Gender is required').oneOf(['male', 'female', 'other']),
@@ -34,6 +38,7 @@ const schema = yup.object({
 });
 
 const defaultValues = {
+  admissionNo: '',
   firstName: '',
   lastName: '',
   gender: '',
@@ -92,6 +97,19 @@ export default function StudentForm({ student, onSubmit, onCancel, submitLabel =
 
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
+      {/* Admission number */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Admission no. *</label>
+        <input
+          {...register('admissionNo')}
+          className="block w-full rounded-lg border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          placeholder="ST-001"
+        />
+        {errors.admissionNo && (
+          <p className="mt-1 text-sm text-red-600">{errors.admissionNo.message}</p>
+        )}
+      </div>
+
       {/* Profile image */}
       <div className="flex flex-col sm:flex-row gap-4 items-start">
         <div className="flex-shrink-0">

@@ -49,21 +49,49 @@ export async function getStudentById(id) {
 }
 
 /**
- * @param {Omit<Student, 'id'|'createdAt'>} payload
+ * @param {Omit<Student, 'id'|'createdAt'> & { admissionNo: string }} payload
  * @returns {Promise<Student>}
  */
 export async function createStudent(payload) {
-  const { data } = await api.post(BASE, payload);
+  const body = {
+    admission_no: payload.admissionNo,
+    first_name: payload.firstName,
+    last_name: payload.lastName,
+    gender: payload.gender || null,
+    date_of_birth: payload.dob || null,
+    email: payload.email,
+    phone: payload.phone,
+    address: payload.address,
+    class_id: payload.classId ?? null,
+    guardian_name: payload.guardianName || null,
+    guardian_phone: payload.guardianPhone || null,
+    status: payload.status,
+  };
+  const { data } = await api.post(BASE, body);
   return data;
 }
 
 /**
  * @param {number} id
- * @param {Partial<Student>} payload
+ * @param {Partial<Student> & { admissionNo?: string }} payload
  * @returns {Promise<Student>}
  */
 export async function updateStudent(id, payload) {
-  const { data } = await api.patch(`${BASE}/${id}`, payload);
+  const body = {
+    ...(payload.admissionNo != null && { admission_no: payload.admissionNo }),
+    ...(payload.firstName != null && { first_name: payload.firstName }),
+    ...(payload.lastName != null && { last_name: payload.lastName }),
+    ...(payload.gender != null && { gender: payload.gender }),
+    ...(payload.dob != null && { date_of_birth: payload.dob }),
+    ...(payload.email != null && { email: payload.email }),
+    ...(payload.phone != null && { phone: payload.phone }),
+    ...(payload.address != null && { address: payload.address }),
+    ...(payload.classId != null && { class_id: payload.classId }),
+    ...(payload.guardianName != null && { guardian_name: payload.guardianName }),
+    ...(payload.guardianPhone != null && { guardian_phone: payload.guardianPhone }),
+    ...(payload.status != null && { status: payload.status }),
+  };
+  const { data } = await api.patch(`${BASE}/${id}`, body);
   return data;
 }
 

@@ -1,12 +1,12 @@
 /**
- * MILESTONE 1: The Axios Brain
- * Central Axios instance with JWT injection and global 401 handling.
- * Place in: src/services/api.js
+ * Central Axios instance: JWT injection, 401 → refresh token + retry, logout on refresh fail.
  */
 
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const TOKEN_KEY = 'token';
+const REFRESH_TOKEN_KEY = 'refreshToken';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -16,41 +16,86 @@ export const api = axios.create({
   timeout: 10000,
 });
 
-/** Callback invoked on 401 - override by app (e.g. clear user + redirect to login) */
+/** Callback invoked when session is truly invalid (e.g. after failed refresh or no refresh token). */
 let onUnauthorized = () => {
-  localStorage.removeItem('token');
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
   localStorage.removeItem('user');
   window.location.href = '/login';
 };
 
-/**
- * Register a custom handler for 401 (e.g. from AuthContext).
- * Call this once in your app bootstrap (e.g. main.jsx or AuthProvider).
- */
 export const setUnauthorizedHandler = (handler) => {
   if (typeof handler === 'function') onUnauthorized = handler;
 };
 
-// ----- Request Interceptor: inject JWT from localStorage -----
+/** In-flight refresh promise so multiple 401s trigger a single refresh. */
+let refreshPromise = null;
+
+function clearStorage() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+  localStorage.removeItem('user');
+}
+
+/**
+ * Call POST /auth/refresh with current refreshToken (no auth header).
+ * Resolves with new access token; rejects on failure.
+ */
+async function doRefresh() {
+  const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+  if (!refreshToken) throw new Error('No refresh token');
+
+  const { data } = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken }, {
+    headers: { 'Content-Type': 'application/json' },
+    timeout: 10000,
+  });
+
+  const newToken = data.token;
+  const newRefreshToken = data.refreshToken;
+  if (newToken) localStorage.setItem(TOKEN_KEY, newToken);
+  if (newRefreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
+  return newToken;
+}
+
+// ----- Request: inject JWT -----
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// ----- Response Interceptor: global 401 handling -----
+// ----- Response: on 401 try refresh then retry; else onUnauthorized -----
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      onUnauthorized();
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status !== 401) {
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
+
+    if (originalRequest.url?.includes('/auth/refresh') || originalRequest.url?.includes('/auth/login')) {
+      onUnauthorized();
+      return Promise.reject(error);
+    }
+
+    if (!refreshPromise) {
+      refreshPromise = doRefresh()
+        .finally(() => { refreshPromise = null; });
+    }
+
+    try {
+      const newToken = await refreshPromise;
+      originalRequest.headers.Authorization = `Bearer ${newToken}`;
+      return api(originalRequest);
+    } catch {
+      clearStorage();
+      onUnauthorized();
+      return Promise.reject(error);
+    }
   }
 );
 

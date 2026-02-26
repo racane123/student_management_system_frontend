@@ -31,6 +31,7 @@ import ResultSummary from '../features/results/pages/ResultSummary';
 import ResultDetails from '../features/results/pages/ResultDetails';
 import ReportCenter from '../features/reports/pages/ReportCenter';
 import FinancialReport from '../features/reports/pages/FinancialReport';
+import RolePermissions from '../pages/RolePermissions';
 
 function App() {
   return (
@@ -106,6 +107,7 @@ function App() {
         />
         <Route path="reports" element={<ReportCenter />} />
         <Route path="reports/financial" element={<FinancialReport />} />
+        <Route path="role-permissions" element={<RolePermissions />} />
       </Route>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

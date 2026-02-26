@@ -4,6 +4,7 @@
  */
 
 import { configureStore } from '@reduxjs/toolkit';
+import authReducer from '../features/auth/authSlice';
 import studentsReducer from '../features/students/studentSlice';
 import teachersReducer from '../features/teachers/teacherSlice';
 import classesReducer from '../features/classes/classSlice';
@@ -16,6 +17,7 @@ import reportsReducer from '../features/reports/reportSlice';
 
 export const store = configureStore({
   reducer: {
+    auth: authReducer,
     students: studentsReducer,
     teachers: teachersReducer,
     classes: classesReducer,
