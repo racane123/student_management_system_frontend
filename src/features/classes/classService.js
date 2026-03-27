@@ -7,6 +7,33 @@ import { api } from '../../services/api';
 
 const BASE = '/classes';
 
+function toApiClass(cls) {
+  if (!cls) return null;
+  return {
+    id: cls.id,
+    gradeLevel: cls.gradeLevel ?? cls.grade_level,
+    section: cls.section,
+    className: cls.className ?? cls.class_name,
+    room: cls.room ?? null,
+    schedule: cls.schedule ?? null,
+    teacherId: cls.teacherId ?? cls.teacher_id ?? cls.adviser_id ?? null,
+    adviser: cls.adviser ?? null,
+    subjectIds: cls.subjectIds ?? cls.subject_ids ?? [],
+    subjectTeachers: cls.subjectTeachers ?? cls.subject_teachers ?? [],
+    students: cls.students ?? [],
+    studentCount: cls.studentCount ?? cls.student_count ?? 0,
+    academicYear: cls.academicYear ?? cls.academic_year,
+    status: cls.status ?? 'active',
+    createdAt: cls.createdAt ?? cls.created_at,
+    updatedAt: cls.updatedAt ?? cls.updated_at,
+  };
+}
+
+function getDefaultAcademicYear() {
+  const year = new Date().getFullYear();
+  return `${year}-${year + 1}`;
+}
+
 /**
  * @typedef {Object} ClassEntity
  * @property {number} id
@@ -31,7 +58,13 @@ const BASE = '/classes';
  */
 export async function getClasses(params = {}) {
   const { data } = await api.get(BASE, { params });
-  return data;
+  if (Array.isArray(data)) {
+    return { data: data.map(toApiClass), totalCount: data.length };
+  }
+  return {
+    ...data,
+    data: Array.isArray(data.data) ? data.data.map(toApiClass) : [],
+  };
 }
 
 /**
@@ -44,7 +77,7 @@ export async function getClasses(params = {}) {
 export async function getClassById(id, opts = {}) {
   const params = opts.populate ? { populate: 'students,adviser' } : {};
   const { data } = await api.get(`${BASE}/${id}`, { params });
-  return data;
+  return toApiClass(data);
 }
 
 /**
@@ -60,8 +93,17 @@ export async function getClassById(id, opts = {}) {
  * @param {string} [payload.status]
  */
 export async function createClass(payload) {
-  const { data } = await api.post(BASE, payload);
-  return data;
+  const snakePayload = {
+    grade_level: payload.gradeLevel,
+    section: payload.section,
+    class_name: payload.className,
+    academic_year: payload.academicYear || getDefaultAcademicYear(),
+    adviser_id: payload.teacherId ?? null,
+    subject_ids: Array.isArray(payload.subjectIds) ? payload.subjectIds : [],
+    status: payload.status || 'active',
+  };
+  const { data } = await api.post(BASE, snakePayload);
+  return toApiClass(data);
 }
 
 /**
@@ -69,8 +111,17 @@ export async function createClass(payload) {
  * @param {Partial<ClassEntity>} payload
  */
 export async function updateClass(id, payload) {
-  const { data } = await api.patch(`${BASE}/${id}`, payload);
-  return data;
+  const snakePayload = {};
+  if (payload.gradeLevel !== undefined) snakePayload.grade_level = payload.gradeLevel;
+  if (payload.section !== undefined) snakePayload.section = payload.section;
+  if (payload.className !== undefined) snakePayload.class_name = payload.className;
+  if (payload.academicYear !== undefined) snakePayload.academic_year = payload.academicYear;
+  if (payload.teacherId !== undefined) snakePayload.adviser_id = payload.teacherId;
+  if (Array.isArray(payload.subjectIds)) snakePayload.subject_ids = payload.subjectIds;
+  if (payload.status !== undefined) snakePayload.status = payload.status;
+
+  const { data } = await api.patch(`${BASE}/${id}`, snakePayload);
+  return toApiClass(data);
 }
 
 /**

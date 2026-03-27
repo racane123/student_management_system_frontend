@@ -4,7 +4,7 @@
  */
 
 import Select from 'react-select';
-import { CLASS_OPTIONS } from '../constants';
+import { useSelector } from 'react-redux';
 
 const customStyles = {
   control: (base) => ({
@@ -26,7 +26,14 @@ const customStyles = {
  */
 export default function AssignClasses({ value = [], onChange, placeholder = 'Select classes...', disabled }) {
   const selected = Array.isArray(value) ? value : [];
-  const options = CLASS_OPTIONS.map((o) => ({ value: o.value, label: o.label }));
+
+  const classList = useSelector((state) => state.classes.classList) ?? [];
+  const options = classList.map((c) => ({
+    value: c.id,
+    label:
+      c.className ||
+      (c.gradeLevel && c.section ? `Grade ${c.gradeLevel}-${c.section}` : `Class ${c.id}`),
+  }));
   const selectedOptions = options.filter((o) => selected.includes(o.value));
 
   const handleChange = (selectedList) => {

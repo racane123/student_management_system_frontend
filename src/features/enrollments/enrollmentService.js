@@ -1,31 +1,28 @@
 /**
- * src/features/exams/examService.js
- * CRUD for exams.
+ * src/features/enrollments/enrollmentService.js
+ * CRUD for enrollments.
  */
 
 import { api } from '../../services/api.js';
 
-const BASE = '/exams';
+const BASE = '/enrollments';
 
 /**
- * @typedef {Object} ExamEntity
+ * @typedef {Object} EnrollmentEntity
  * @property {number} id
- * @property {string} title
- * @property {string} description
+ * @property {number} studentId
  * @property {number} classId
- * @property {number} subjectId
- * @property {string} date
- * @property {number} duration
+ * @property {string} enrollmentDate
  * @property {string} status
+ * @property {number} [feeId]
  */
 
 /**
  * @param {Object} params
- * @param {string} [params.search]
+ * @param {number} [params.studentId]
  * @param {number} [params.classId]
- * @param {string} [params.status]
  */
-export async function getExams(params = {}) {
+export async function getEnrollments(params = {}) {
   const { data } = await api.get(BASE, { params });
   return data;
 }
@@ -33,7 +30,7 @@ export async function getExams(params = {}) {
 /**
  * @param {number} id
  */
-export async function getExamById(id) {
+export async function getEnrollmentById(id) {
   const { data } = await api.get(`${BASE}/${id}`);
   return data;
 }
@@ -41,7 +38,7 @@ export async function getExamById(id) {
 /**
  * @param {Object} payload
  */
-export async function createExam(payload) {
+export async function createEnrollment(payload) {
   const { data } = await api.post(BASE, payload);
   return data;
 }
@@ -50,7 +47,7 @@ export async function createExam(payload) {
  * @param {number} id
  * @param {Object} payload
  */
-export async function updateExam(id, payload) {
+export async function updateEnrollment(id, payload) {
   const { data } = await api.patch(`${BASE}/${id}`, payload);
   return data;
 }
@@ -58,14 +55,14 @@ export async function updateExam(id, payload) {
 /**
  * @param {number} id
  */
-export async function deleteExam(id) {
+export async function deleteEnrollment(id) {
   await api.delete(`${BASE}/${id}`);
 }
 
 export default {
-  getExams,
-  getExamById,
-  createExam,
-  updateExam,
-  deleteExam,
+  getEnrollments,
+  getEnrollmentById,
+  createEnrollment,
+  updateEnrollment,
+  deleteEnrollment,
 };

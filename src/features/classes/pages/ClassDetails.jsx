@@ -7,8 +7,7 @@ import { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ArrowLeft, MapPin, Calendar, User, Users, BookOpen } from 'lucide-react';
-import { fetchClassById, clearSelectedClass } from '../classSlice';
-import { SUBJECT_OPTIONS } from '../constants';
+import { fetchClassById, clearSelectedClass, fetchClassFormDependencies } from '../classSlice';
 
 function getAdviserName(teacherId, teacherList) {
   if (teacherId == null) return '—';
@@ -16,8 +15,9 @@ function getAdviserName(teacherId, teacherList) {
   return t ? [t.firstName, t.lastName].filter(Boolean).join(' ') : '—';
 }
 
-function getSubjectLabel(id) {
-  return SUBJECT_OPTIONS.find((o) => o.value === id)?.label ?? `Subject ${id}`;
+function getSubjectLabel(id, subjectList) {
+  const subject = (subjectList ?? []).find((s) => s.id === id);
+  return subject?.name || subject?.code || `Subject ${id}`;
 }
 
 export default function ClassDetails() {
@@ -26,9 +26,11 @@ export default function ClassDetails() {
   const dispatch = useDispatch();
   const { selectedClass, loading, error } = useSelector((state) => state.classes);
   const teacherList = useSelector((state) => state.teachers.teacherList) ?? [];
+  const subjectList = useSelector((state) => state.subjects.subjectList) ?? [];
   const studentList = useSelector((state) => state.students.studentList) ?? [];
 
   useEffect(() => {
+    dispatch(fetchClassFormDependencies());
     if (id && id !== 'new') {
       dispatch(fetchClassById({ id, populate: true }));
     }
@@ -200,7 +202,7 @@ export default function ClassDetails() {
                   key={subjectId}
                   className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/50 px-3 py-2"
                 >
-                  <span className="text-sm font-medium text-gray-900">{getSubjectLabel(subjectId)}</span>
+                  <span className="text-sm font-medium text-gray-900">{getSubjectLabel(subjectId, subjectList)}</span>
                   <span className="text-sm text-gray-600">
                     {getAdviserName(teacherId, teacherList)}
                   </span>

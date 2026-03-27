@@ -8,12 +8,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { fetchTeacherById, createTeacherThunk, updateTeacherThunk, clearCurrentTeacher } from '../teacherSlice';
 import TeacherForm from '../components/TeacherForm';
+import { fetchSubjects } from '../../subjects/subjectSlice';
+import { fetchClasses } from '../../classes/classSlice';
 
 export default function TeacherFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { currentTeacher, loading } = useSelector((state) => state.teachers);
+  const subjectList = useSelector((state) => state.subjects.subjectList) ?? [];
+  const classList = useSelector((state) => state.classes.classList) ?? [];
   const isEdit = id && id !== 'new';
 
   useEffect(() => {
@@ -22,6 +26,16 @@ export default function TeacherFormPage() {
     }
     return () => dispatch(clearCurrentTeacher());
   }, [id, isEdit, dispatch]);
+
+  useEffect(() => {
+    // Ensure form dropdowns use live DB-backed options.
+    if (!subjectList.length) {
+      dispatch(fetchSubjects()).unwrap().catch(() => {});
+    }
+    if (!classList.length) {
+      dispatch(fetchClasses()).unwrap().catch(() => {});
+    }
+  }, [dispatch, subjectList.length, classList.length]);
 
   const handleSubmit = async (payload) => {
     const { profileImageFile, ...rest } = payload;
@@ -43,7 +57,7 @@ export default function TeacherFormPage() {
 
   if (isEdit && loading && !currentTeacher) {
     return (
-      <div className="max-w-2xl space-y-4">
+      <div className="space-y-4">
         <div className="h-8 w-48 rounded bg-gray-200 animate-pulse" />
         <div className="h-96 rounded-xl bg-gray-100 animate-pulse" />
       </div>
@@ -51,7 +65,7 @@ export default function TeacherFormPage() {
   }
 
   return (
-    <div className="max-w-2xl">
+    <div>
       <h1 className="mb-6 text-2xl font-bold text-gray-900">
         {isEdit ? 'Edit teacher' : 'Add teacher'}
       </h1>

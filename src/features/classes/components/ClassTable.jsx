@@ -8,7 +8,11 @@ import { MoreVertical, Eye, Pencil, Trash2 } from 'lucide-react';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { useSelector } from 'react-redux';
 
-function getAdviserName(teacherId, teacherList) {
+function getAdviserName(classEntity, teacherList) {
+  if (classEntity?.adviser) {
+    return [classEntity.adviser.firstName, classEntity.adviser.lastName].filter(Boolean).join(' ') || '—';
+  }
+  const teacherId = classEntity?.teacherId;
   if (teacherId == null) return '—';
   const t = (teacherList ?? []).find((x) => x.id === teacherId);
   return t ? [t.firstName, t.lastName].filter(Boolean).join(' ') || `Teacher ${t.id}` : '—';
@@ -59,7 +63,7 @@ export default function ClassTable({ classes, studentCountByClassId, onEdit, onD
                   </td>
                   <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-900">{displayName}</td>
                   <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-600">
-                    {getAdviserName(c.teacherId, teacherList)}
+                    {getAdviserName(c, teacherList)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-600">{count}</td>
                   <td className="relative whitespace-nowrap py-3 pl-3 pr-4 text-right">

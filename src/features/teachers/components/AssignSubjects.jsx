@@ -4,7 +4,7 @@
  */
 
 import Select from 'react-select';
-import { SUBJECT_OPTIONS } from '../constants';
+import { useSelector } from 'react-redux';
 
 const customStyles = {
   control: (base) => ({
@@ -26,7 +26,12 @@ const customStyles = {
  */
 export default function AssignSubjects({ value = [], onChange, placeholder = 'Select subjects...', disabled }) {
   const selected = Array.isArray(value) ? value : [];
-  const options = SUBJECT_OPTIONS.map((o) => ({ value: o.value, label: o.label }));
+
+  const subjectList = useSelector((state) => state.subjects.subjectList) ?? [];
+  const options = subjectList.map((s) => ({
+    value: s.id,
+    label: s.name || s.code || `Subject ${s.id}`,
+  }));
   const selectedOptions = options.filter((o) => selected.includes(o.value));
 
   const handleChange = (selectedList) => {

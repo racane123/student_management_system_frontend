@@ -6,6 +6,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import * as classService from './classService';
 import { fetchTeachers } from '../teachers/teacherSlice';
+import { fetchSubjects } from '../subjects/subjectSlice';
 
 const initialState = {
   classList: [],
@@ -67,9 +68,12 @@ export const fetchClassById = createAsyncThunk(
 export const fetchClassFormDependencies = createAsyncThunk(
   'classes/fetchFormDependencies',
   async (_, { dispatch, getState }) => {
-    const { teachers } = getState();
+    const { teachers, subjects } = getState();
     if (!teachers.teacherList?.length) {
       await dispatch(fetchTeachers()).unwrap();
+    }
+    if (!subjects.subjectList?.length) {
+      await dispatch(fetchSubjects()).unwrap();
     }
     return {};
   }
